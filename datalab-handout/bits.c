@@ -295,26 +295,26 @@ int isLessOrEqual(int x, int y) {
   int posOverflow = ((!isXNeg) & (isYNeg)) & (neg);
   return equal | negOverflow | ((!posOverflow) & neg);
 
-
   /**
-   * reference solution 
+   * reference solution
    *
    * // check 4 cases:
    * //   1. x < 0, y >= 0 => x <= y => return 1
    * //   2. x >= 0, y < 0 => x >= y => return 0
    * //   3. x < 0, y < 0 => y - x >= 0 iff. y >= x, there will be no overflow
    * //   4. x >= 0, y >= 0 => same case as 3
-   * // 
+   * //
    * // so we first check case 1, which is `yIsPos & xIsNeg`
    * // then we check case 3 and 4
    * // but CAUTION HERE: if x >= 0, y < 0, y - x >= 0 when overflow occurs,
-   * // so we need to eliminate case 2 as `yIsPos | xIsNeg`, then check if `yMinusXIsPos`
-   * 
+   * // so we need to eliminate case 2 as `yIsPos | xIsNeg`, then check if
+   * `yMinusXIsPos`
+   *
    * int yIsPos = !(y >> 31), xIsNeg = !((x >> 31) + 1);
    * int yMinusXIsPos = !((y + ~x + 1) >> 31);
    * return (yIsPos & xIsNeg) | ((yIsPos | xIsNeg) & yMinusXIsPos);
    */
-    
+
   /**
    */
 }
@@ -327,7 +327,37 @@ int isLessOrEqual(int x, int y) {
  *   Max ops: 12
  *   Rating: 4
  */
-int logicalNeg(int x) { return 2; }
+int logicalNeg(int x) {
+  /**
+   * or all the bit to lowest bit
+   */
+  x = (x >> 16) | x;
+  x = (x >> 8) | x;
+  x = (x >> 4) | x;
+  x = (x >> 2) | x;
+  x = ((x >> 1) | x);
+  /**
+   * neg the lowest bit
+   */
+  x = (~x) & 1;
+  return x;
+
+  /**
+   * reference solution 
+   *
+   * // gather all the bits into the most significant bit
+   * // if x == 0, we will get [00...00], right shift 31 bits => 0x0, +1 => 0x1
+   * // if x != 0, we will get [10...00], right shift 31 bits => 0xffffffff, +1 => 0x0
+   *
+   * int a = x | (x << 16);
+   * int b = a | (a << 8);
+   * int c = b | (b << 4);
+   * int d = c | (c << 2);
+   * int e = d | (d << 1);
+   * return (e >> 31) + 1;
+   */
+
+}
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
  *  Examples: howManyBits(12) = 5
