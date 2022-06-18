@@ -282,7 +282,42 @@ int conditional(int x, int y, int z) {
  *   Max ops: 24
  *   Rating: 3
  */
-int isLessOrEqual(int x, int y) { return 2; }
+int isLessOrEqual(int x, int y) {
+  int equal = !(x ^ y);
+  int diff = x + ~y + 1;
+  int neg = (diff >> 31) & 1;
+  int isXNeg = (x >> 31) & 1;
+  int isYNeg = (y >> 31) & 1;
+  /**
+   * detect postive overflow and negtive overflow
+   */
+  int negOverflow = ((isXNeg) & (!isYNeg)) & (!neg);
+  int posOverflow = ((!isXNeg) & (isYNeg)) & (neg);
+  return equal | negOverflow | ((!posOverflow) & neg);
+
+
+  /**
+   * reference solution 
+   *
+   * // check 4 cases:
+   * //   1. x < 0, y >= 0 => x <= y => return 1
+   * //   2. x >= 0, y < 0 => x >= y => return 0
+   * //   3. x < 0, y < 0 => y - x >= 0 iff. y >= x, there will be no overflow
+   * //   4. x >= 0, y >= 0 => same case as 3
+   * // 
+   * // so we first check case 1, which is `yIsPos & xIsNeg`
+   * // then we check case 3 and 4
+   * // but CAUTION HERE: if x >= 0, y < 0, y - x >= 0 when overflow occurs,
+   * // so we need to eliminate case 2 as `yIsPos | xIsNeg`, then check if `yMinusXIsPos`
+   * 
+   * int yIsPos = !(y >> 31), xIsNeg = !((x >> 31) + 1);
+   * int yMinusXIsPos = !((y + ~x + 1) >> 31);
+   * return (yIsPos & xIsNeg) | ((yIsPos | xIsNeg) & yMinusXIsPos);
+   */
+    
+  /**
+   */
+}
 // 4
 /*
  * logicalNeg - implement the ! operator, using all of
