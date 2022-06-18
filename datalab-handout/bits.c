@@ -227,7 +227,29 @@ int negate(int x) { return ~x + 1; }
  *   Max ops: 15
  *   Rating: 3
  */
-int isAsciiDigit(int x) { return 2; }
+int isAsciiDigit(int x) {
+  /*
+   * y = x - 0x30, so 0x0 <= y <= 0x9
+   * for 0x0 <= y <= 0x7, just right shift 3 bits and check result is 0,
+   * for y = 0x8 or y = 0x9, check as special cases
+   */
+  int y = x + ~0x30 + 1;
+  return (!(y >> 3)) | !(y ^ 0x8) | !(y ^ 0x9);
+
+  /**
+   * My solution is problematic, exceed the maximum limit of operator
+   *
+   * int is16Bit = !((x >> 8) | (x >> 16) | (x >> 24));
+   * // retrieve the high 4 bit, check whether it is conform 0011
+   * int preCond = !((0xF0 & x) ^ 0x30);
+   * // condA -- check whether the first bit of low 4 bits is 1. ie, 1xxx
+   * // condB -- check whether the second and third bit of low 4 bits is 1,
+   * // ie, x11x
+   * int condA = !!(0x08 & x);
+   * int condB = !!(0x06 & x);
+   * return is16Bit & preCond & ((condA & !condB) | (!condA));
+   */
+}
 /*
  * conditional - same as x ? y : z
  *   Example: conditional(2,4,5) = 4
