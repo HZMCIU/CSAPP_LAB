@@ -257,7 +257,24 @@ int isAsciiDigit(int x) {
  *   Max ops: 16
  *   Rating: 3
  */
-int conditional(int x, int y, int z) { return 2; }
+int conditional(int x, int y, int z) {
+  int condA = !!x;
+  int condB = !condA;
+  int selA = 0 + ~condA + 1;
+  int selB = 0 + ~condB + 1;
+  return (selA & y) | (selB & z);
+  /**
+   * reference solutions
+   *
+   * // with bit operation, we can use this rule:
+   * // when mask = [00...00], (mask & a) | (~mask | b) = b;
+   * // when mask = [11...11], (mask & a) | (~mask | b) = a;
+   * // so we try to make these two masks from x
+   *
+   * int mask = !x + ~1 + 1;
+   * return (mask & y) | (~mask & z);
+   */
+}
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
  *   Example: isLessOrEqual(4,5) = 1.
