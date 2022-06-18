@@ -161,7 +161,19 @@ int tmin(void) { return 1 << 31; }
  *   Max ops: 10
  *   Rating: 1
  */
-int isTmax(int x) { return 2; }
+int isTmax(int x) {
+  /*
+   * only for
+   *    | 01...11 | 11...11 |
+   * +1 | 10...00 | 00...00 |
+   * ~  | 10...00 | 00...00 |
+   * that we can get x+1 == ~x, which is `a`
+   * so we just need to judge if x is not 0xffffffff, which is `b`
+   */
+  int notMinusOne = !!(x + 1);
+  int cond = ~(x ^ (x + 1));
+  return (!cond) & notMinusOne;
+}
 /*
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
  *   where bits are numbered from 0 (least significant) to 31 (most significant)
