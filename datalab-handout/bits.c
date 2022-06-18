@@ -182,7 +182,34 @@ int isTmax(int x) {
  *   Max ops: 12
  *   Rating: 2
  */
-int allOddBits(int x) { return 2; }
+int allOddBits(int x) {
+  /*
+   * halfing the bit vector, util get 8-bit vector
+   */
+  x = (x >> 16) & x;
+  x = (x >> 8) & x;
+  x = x & 0xAA;
+  /**
+   * double the bit vector, util restore 32-bit vector.
+   * check whether it is 0xFFFFFFFF
+   */
+  x = x | 0x55;
+  x = (x << 8) | x;
+  x = (x << 16) | x;
+  return !(x + 1);
+
+  /**
+   * Another solution
+   * 
+   * half the bit vector, `&` the halves until get a 4 bit vector
+   * then test if it has pattern as `[1x1x]` (use mask 0xAA)
+   * it evalutes true iff. all odd bits 
+   *
+   * int a = (x & (x >> 16));
+   * int b = (a & (a >> 8));
+   * return !((b & 0xAA) ^ 0xAA);
+   */
+}
 /*
  * negate - return -x
  *   Example: negate(1) = -1.
