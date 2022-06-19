@@ -343,11 +343,12 @@ int logicalNeg(int x) {
   return x;
 
   /**
-   * reference solution 
+   * reference solution
    *
    * // gather all the bits into the most significant bit
    * // if x == 0, we will get [00...00], right shift 31 bits => 0x0, +1 => 0x1
-   * // if x != 0, we will get [10...00], right shift 31 bits => 0xffffffff, +1 => 0x0
+   * // if x != 0, we will get [10...00], right shift 31 bits => 0xffffffff, +1
+   * => 0x0
    *
    * int a = x | (x << 16);
    * int b = a | (a << 8);
@@ -356,7 +357,6 @@ int logicalNeg(int x) {
    * int e = d | (d << 1);
    * return (e >> 31) + 1;
    */
-
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -370,7 +370,26 @@ int logicalNeg(int x) {
  *  Max ops: 90
  *  Rating: 4
  */
-int howManyBits(int x) { return 0; }
+int howManyBits(int x) {
+  int bit16=0, bit8, bit4, bit2, bit1, bit0;
+  // we can get a fact that if x < 0, then `howManyBits(x) == howManyBits(~x)`
+
+  // invert x if x < 0
+  x = x ^ (x >> 31);
+
+  // count bit of 1 using binary search
+  bit16 = !!(x >> 16) << 4;
+  x = x >> bit16;
+  bit8 = !!(x >> 8) << 3;
+  x = x >> bit8;
+  bit4 = !!(x >> 4) << 2;
+  x = x >> bit4;
+  bit2 = !!(x >> 2) << 1;
+  x = x >> bit2;
+  bit1 = !!(x >> 1) << 0;
+  bit0 = !!x;
+  return bit16 + bit8 + bit4 + bit2 + bit1 + bit0 + 1;
+}
 // float
 /*
  * floatScale2 - Return bit-level equivalent of expression 2*f for
