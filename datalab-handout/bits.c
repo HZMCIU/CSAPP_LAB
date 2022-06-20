@@ -371,7 +371,7 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  int bit16=0, bit8, bit4, bit2, bit1, bit0;
+  int bit16 = 0, bit8, bit4, bit2, bit1, bit0;
   // we can get a fact that if x < 0, then `howManyBits(x) == howManyBits(~x)`
 
   // invert x if x < 0
@@ -402,7 +402,28 @@ int howManyBits(int x) {
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned floatScale2(unsigned uf) { return 2; }
+unsigned floatScale2(unsigned uf) {
+  int exp = (uf >> 23) & 0xff;
+  int frac = uf & 0x7fffff;
+  int sign = uf >> 31;
+
+  // not a NaN
+  if (exp != 0xff) {
+    // denormalized number
+    if (!exp) {
+      frac = frac * 2;
+      if ((frac & 0x800000) == 0x800000) {
+        exp = 0x01;
+      }
+    } 
+    // normalized number
+    else {
+      exp++;
+    }
+    uf = sign << 31 | exp << 23 | (frac & 0x7fffff);
+  }
+  return uf;
+}
 /*
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
  *   for floating point argument f.
