@@ -415,7 +415,7 @@ unsigned floatScale2(unsigned uf) {
       if ((frac & 0x800000) == 0x800000) {
         exp = 0x01;
       }
-    } 
+    }
     // normalized number
     else {
       exp++;
@@ -436,7 +436,32 @@ unsigned floatScale2(unsigned uf) {
  *   Max ops: 30
  *   Rating: 4
  */
-int floatFloat2Int(unsigned uf) { return 2; }
+int floatFloat2Int(unsigned uf) {
+  int exp = (uf >> 23) & 0xff;
+  int frac = uf & 0x7fffff;
+  int sign = uf & 0x80000000;
+
+  if (exp != 0x0) {
+    frac |= 0x800000;
+  }
+
+  exp -= 127;
+  frac <<= 7;
+
+  // 0.xxx truncate to 0
+  if (exp < 0)
+    return 0;
+  // out of range
+  else if (exp > 30)
+    return 0x80000000u;
+  else {
+    int leftShift = 30 - exp;
+    // add sign bit first, then left shift, cannot reverse the order
+    frac |= sign;
+    frac >>= leftShift;
+    return frac;
+  }
+}
 /*
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
  *   (2.0 raised to the power x) for any 32-bit integer x.
